@@ -133,3 +133,40 @@ struct UserModel: Codable {
 ////END PUT METHOD
 
 
+//START GET ACTIVE USERS METHOD
+func getAllUsers() -> [UserModel] {
+    let url = URL(string : "https://localhost:5001/users/getactiveusers")
+    guard let requestURL = url else { fatalError() }
+    var request = URLRequest(url: requestURL)
+    request.httpMethod = "GET"
+    var users:[UserModel] = []
+    let task = URLSession.shared.dataTask(with: request) {
+        (data, response, error) in
+        if let error = error {
+            print("error: \(error)")
+        }
+        if let response = response as? HTTPURLResponse {
+            print("respone: \(response.statusCode)")
+        }
+        if let data = data, let dataString = String(data: data, encoding: .utf8){
+            do{
+                users = try JSONDecoder().decode([UserModel].self, from: data)
+                for user in userList{
+                    print(user.firstName)
+                }
+                
+            } catch {
+                print("error: \(error.localizedDescription)")
+            }
+        }
+        
+    }
+    task.resume()
+}
+//END GET METHOD
+
+var userList = getAllUsers();
+
+for user in userList{
+    print(user.firstName)
+}
